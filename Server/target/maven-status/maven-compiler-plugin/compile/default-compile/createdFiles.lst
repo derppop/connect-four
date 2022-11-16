@@ -1,4 +1,7 @@
+CFourInfo.class
+Server$ClientThread.class
+GameButton.class
 Server.class
 ServerGUI.class
-Server$ClientThread.class
 Server$TheServer.class
+ServerGUI$1.class

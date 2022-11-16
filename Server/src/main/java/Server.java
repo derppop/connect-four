@@ -12,12 +12,14 @@ public class Server {
     ArrayList<ClientThread> clients = new ArrayList<ClientThread>(); // stores clients in order to keep track of them
     TheServer server;
     private Consumer<Serializable> callback; // DO NOT UNDERSTAND
+    private CFourInfo gameState;
 
     Server(Consumer<Serializable> call, int port) {
         callback = call; // DO NOT UNDERSTAND
         server = new TheServer();
         server.start();
         this.port = port;
+        gameState = new CFourInfo();
     }
 
     public class TheServer extends Thread { // Instance of this class will sit in its own thread accepting clients
@@ -48,5 +50,50 @@ public class Server {
             this.connection = connection;
             this.count = count;
         }
+
+        public void updateClients(CFourInfo gameStateToSend) {
+            for(int i = 0; i < clients.size(); i++) {
+                ClientThread t = clients.get(i);
+                try{
+                    t.out.writeObject(gameStateToSend);
+                }
+                catch (Exception e) {}
+            }
+        }
+
+        public void run() {
+            try {
+                in = new ObjectInputStream(connection.getInputStream());
+                out = new ObjectOutputStream(connection.getOutputStream());
+                connection.setTcpNoDelay(true);
+            }
+            catch(Exception e) {
+                System.out.println("Streams not open");
+            }
+
+            updateClients(gameState);
+
+            while(true) {
+                try {
+                    CFourInfo data = (CFourInfo) in.readObject();
+                    callback.accept(data.getRecentMove());
+                    updateClients(data);
+
+                }
+                catch(Exception e) {
+                    callback.accept("OOOOPPs...Something wrong with the socket from client: " + count + "....closing down!");
+                    clients.remove(this);
+                    break;
+                }
+            }
+        }
+    }
+
+    public int getNumOfClients() {
+        return count-1;
+    }
+
+    public int getPort() {
+        return port;
     }
 }
