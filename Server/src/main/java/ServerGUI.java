@@ -110,6 +110,7 @@ public class ServerGUI extends Application {
 		System.out.println("changing scene");
 		stage.setScene(mainScene());
 	}
+
 	public void closeServer() {
 		System.out.println("Closing server!");
 		Platform.exit();

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Label?>
+
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" styleClass="borderPane" fx:controller="MyController" fx:id="root">
+    <center>
+        <VBox fx:id="OuterVBox" styleClass="outerVBox">
+            <Label fx:id="Connect 4 Client" styleClass="C4Label" text="Connect Four"/>
+            <center>
+                <VBox fx:id="InnerVBox" styleClass="innerVBox">
+                    <Textfield fx:id="IPField" styleClass="TextFieldandButton" text="IP Address" onAction=""/>
+                    <Textfield fx:id="PortField" styleClass="TextFieldandButton" text="Port" onAction=""/>
+                </VBox>
+            </center>
+            <Button fx:id="PlayButton" styleClass="TextFieldandButton" text="Play" onAction=""/>
+        </VBox>
+    </center>
+</BorderPane>
