@@ -9,7 +9,6 @@ import java.util.function.Consumer;
 
 public class Client extends Thread{
 
-
     Socket socketClient;
 
     ObjectOutputStream out;
@@ -23,15 +22,16 @@ public class Client extends Thread{
 
     private Consumer<Serializable> callback;
 
-    Client(Consumer<Serializable> call){
-
+    Client(Consumer<Serializable> call, String ipAddress, int port){
         callback = call;
+        this.ipAddress = ipAddress;
+        this.port = port;
     }
 
     public void run() {
 
         try {
-            socketClient= new Socket("127.0.0.1",5555);
+            socketClient= new Socket(ipAddress,port);
             out = new ObjectOutputStream(socketClient.getOutputStream());
             in = new ObjectInputStream(socketClient.getInputStream());
             socketClient.setTcpNoDelay(true);
@@ -41,15 +41,15 @@ public class Client extends Thread{
         while(true) {
 
             try {
-                String message = in.readObject().toString();
-                callback.accept(message);
+                gameState = (CFourInfo) in.readObject();
+                callback.accept(gameState);
             }
             catch(Exception e) {}
         }
 
     }
 
-    public void send(String data) {
+    public void send(CFourInfo data) {
 
         try {
             out.writeObject(data);
@@ -57,5 +57,9 @@ public class Client extends Thread{
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
+
+    public CFourInfo getGameState() {
+        return gameState;
     }
 }
