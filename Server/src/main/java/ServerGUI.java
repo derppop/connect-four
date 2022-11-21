@@ -65,7 +65,8 @@ public class ServerGUI extends Application {
 		TextField portField = new TextField();
 		portField.setPromptText("Port number");
 		portField.setMaxWidth(90);
-		portField.setStyle("-fx-background-color: #606060");
+		portField.setStyle("-fx-background-color: #606060;" +
+				"-fx-text-fill: white");
 
 		Button startButton = new Button("Start server");
 		startButton.setStyle("-fx-background-color: #606060;" +

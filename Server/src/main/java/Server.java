@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -12,14 +13,16 @@ public class Server {
     ArrayList<ClientThread> clients = new ArrayList<ClientThread>(); // stores clients in order to keep track of them
     TheServer server;
     private Consumer<Serializable> callback; // DO NOT UNDERSTAND
-    private CFourInfo gameState;
+    private CFourInfo gameInfo;
+    int playersTurn = 1;
 
     Server(Consumer<Serializable> call, int port) {
         callback = call; // DO NOT UNDERSTAND
         server = new TheServer();
         server.start();
         this.port = port;
-        gameState = new CFourInfo();
+        gameInfo = new CFourInfo();
+        gameInfo.setStatus("Waiting for second player");
     }
 
     public class TheServer extends Thread { // Instance of this class will sit in its own thread accepting clients
@@ -29,8 +32,15 @@ public class Server {
 
                 while (true) {
                     ClientThread client = new ClientThread(mySocket.accept(), count);
-                    callback.accept("A Client has connected: Client #" + count); // DO NOT UNDERSTAND
+                    callback.accept("A Client has connected: Client #" + count);
                     clients.add(client);
+                    if (count == 1) {
+                        gameInfo.setPlayer1(true); // there is one player
+                    } else if (count == 2) {
+                        gameInfo.setPlayer2(true); // there is two players
+                    } else {
+                        System.out.println("More than two players, dont know what to do");
+                    }
                     client.start();
                     count++;
                 }
@@ -40,22 +50,48 @@ public class Server {
         }
     }
 
+    // this function is broken
+    public void updateGameInfo(ClientThread t) {
+        if (gameInfo.isPlayer1() && gameInfo.isPlayer2()) {
+            if (playersTurn == 1) { // tell player 1 it's their turn and player two it's not
+                gameInfo.status = "Player one's turn";
+                if(t.count == 1) {
+                    gameInfo.setTurn(true);
+                } else if (t.count == 2) {
+                    gameInfo.setTurn(false);
+                }
+            } else if (playersTurn == 2) { // tell player 1 it's not their turn and player two that it is
+                gameInfo.status = "Player two's turn";
+                if(t.count == 1) {
+                    gameInfo.setTurn(false);
+                } else if (t.count == 2) {
+                    gameInfo.setTurn(true);
+                }
+            }
+            System.out.println(gameInfo.getPlayerNum());
+        }
+        gameInfo.setPlayerNum(t.count);
+    }
+
     public class ClientThread extends Thread {
         Socket connection; // socket to client
         int count;
         ObjectInputStream in;
         ObjectOutputStream out;
 
-        ClientThread(Socket connection, int count) {
+        ClientThread(Socket connection, int count){
             this.connection = connection;
             this.count = count;
         }
 
-        public void updateClients(CFourInfo gameStateToSend) {
+        public void updateClients() {
+
             for(int i = 0; i < clients.size(); i++) {
                 ClientThread t = clients.get(i);
+                updateGameInfo(t);
+
                 try{
-                    t.out.writeObject(gameStateToSend);
+                    t.out.writeObject(gameInfo);
                 }
                 catch (Exception e) {}
             }
@@ -71,13 +107,14 @@ public class Server {
                 System.out.println("Streams not open");
             }
 
-            updateClients(gameState);
+            updateClients();
 
             while(true) {
                 try {
                     CFourInfo data = (CFourInfo) in.readObject();
                     callback.accept(data.getRecentMove());
-                    updateClients(data);
+                    gameInfo = data;
+                    updateClients();
 
                 }
                 catch(Exception e) {
