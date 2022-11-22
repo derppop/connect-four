@@ -5,71 +5,72 @@ import java.util.Objects;
 // Player 1 : Purple
 // Player 2 : Cyan
 public class CFourInfo implements Serializable {
+    boolean Player1 = false; // tells player if there is a player 1
+    boolean Player2 = false; // tells the player if there is a player 2
 
-    private GameButton[][] grid;
+    boolean turn = false; // tells the player if its their turn
 
-    private int player = 1;
+    int col = -1; // tells the player where other player placed chip in order to modify their own screen
 
-    private String recentMove;
+    String recentMove;
 
-    public CFourInfo() {
-        grid = new GameButton[6][7];
-        for(int i = 0; i < 6; i++) {
-            for(int j = 0; j < 7; j++) {
-                GameButton button = new GameButton("Gray", i, j);
-                int finalJ = j;
-                button.setOnAction(e -> { // Once button on grid is pressed, this event is fired
-                    playChip(finalJ);
-                });
-                grid[i][j] = button;
-            }
-        }
+    String status;
+
+    int playerNum;
+
+    public boolean isPlayer1() {
+        return Player1;
     }
 
-    private GameButton findEmptySpot(int col) {
-        int row = 0;
-
-        while (row < 6) {
-            if (grid[row+1][col].getColor() == "Grey") { // Check if there is a valid slot below
-                row++;
-            } else {
-                return grid[row][col]; // On the valid slot
-            }
-        }
-        // If this point is reached, entire column is full
-        return null;
+    public void setPlayer1(boolean player1) {
+        Player1 = player1;
     }
 
-    private void playChip(int col) {
-        GameButton button = findEmptySpot(col);
-        if (button != null) { // Found a valid spot to place chip
-            recentMove = "Player " + player + " placed a chip in column " + col;
-            if (player == 1) { // Change color of spot and move on to next player
-                button.setColor("Purple");
-                player = 2;
-            } else {
-                button.setColor("Cyan");
-                player = 1;
-            }
-        }
+    public boolean isPlayer2() {
+        return Player2;
     }
 
-    public GameButton[][] getGrid() {
-        return grid;
+    public void setPlayer2(boolean player2) {
+        Player2 = player2;
+    }
+
+    public int getCol() {
+        return col;
+    }
+
+    public void setCol(int col) {
+        this.col = col;
+    }
+
+    public boolean isTurn() {
+        return turn;
+    }
+
+    public void setTurn(boolean turn) {
+        this.turn = turn;
     }
 
     public String getRecentMove() {
         return recentMove;
     }
 
-    public int getPlayer() {
-        return player;
+    public void setRecentMove(String recentMove) {
+        this.recentMove = recentMove;
     }
 
-    public boolean checkIfPlayerWon() {
-        GameButton curButton = grid[0][0];
-        // fucked
+    public String getStatus() {
+        return status;
+    }
 
-        return false;
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public int getPlayerNum() {
+        return playerNum;
+    }
+
+    public void setPlayerNum(int playerNum) {
+        this.playerNum = playerNum;
     }
 }

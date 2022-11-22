@@ -1,12 +1,11 @@
 import javafx.scene.control.Button;
 
 public class GameButton extends Button {
-    private String color;
+    private String color = "Gray";
     int col;
     int row;
 
-    GameButton(String color, int row, int col) {
-        this.color = color;
+    GameButton(int row, int col) {
         this.col = col;
         this.row = row;
     }

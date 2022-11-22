@@ -14,11 +14,13 @@ public class Client extends Thread{
     ObjectOutputStream out;
     ObjectInputStream in;
 
-    CFourInfo gameState;
+    CFourInfo gameInfo;
 
     String ipAddress;
 
     int port;
+
+    int playerNum;
 
     private Consumer<Serializable> callback;
 
@@ -26,6 +28,7 @@ public class Client extends Thread{
         callback = call;
         this.ipAddress = ipAddress;
         this.port = port;
+        this.gameInfo = new CFourInfo();
     }
 
     public void run() {
@@ -41,8 +44,10 @@ public class Client extends Thread{
         while(true) {
 
             try {
-                gameState = (CFourInfo) in.readObject();
-                callback.accept(gameState);
+                CFourInfo data = (CFourInfo) in.readObject();
+                gameInfo = data;
+                playerNum = gameInfo.getPlayerNum();
+                callback.accept(data);
             }
             catch(Exception e) {}
         }
@@ -59,7 +64,15 @@ public class Client extends Thread{
         }
     }
 
-    public CFourInfo getGameState() {
-        return gameState;
+    public CFourInfo getGameInfo() {
+        return gameInfo;
+    }
+
+    public void setGameInfo(CFourInfo gameInfo) {
+        this.gameInfo = gameInfo;
+    }
+
+    public int getPlayerNum() {
+        return playerNum;
     }
 }
