@@ -5,10 +5,14 @@ import java.util.Objects;
 // Player 1 : Purple
 // Player 2 : Cyan
 public class CFourInfo implements Serializable {
+
+    public CFourInfo() {
+        System.out.println("Making instance of CFourInfo");
+    }
     boolean Player1 = false; // tells player if there is a player 1
     boolean Player2 = false; // tells the player if there is a player 2
 
-    boolean turn = false; // tells the player if its their turn
+    boolean turn = true; // tells the player if its their turn
 
     int col = -1; // tells the player where other player placed chip in order to modify their own screen
 

@@ -44,10 +44,10 @@ public class Client extends Thread{
         while(true) {
 
             try {
-                CFourInfo data = (CFourInfo) in.readObject();
-                gameInfo = data;
+                this.setGameInfo((CFourInfo) in.readObject());
                 playerNum = gameInfo.getPlayerNum();
-                callback.accept(data);
+                System.out.println("On player " + playerNum + ", received status: " + gameInfo.getStatus());
+                callback.accept(gameInfo);
             }
             catch(Exception e) {}
         }

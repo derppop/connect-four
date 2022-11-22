@@ -8,7 +8,7 @@ public class CFourInfo implements Serializable {
     boolean Player1 = false; // tells player if there is a player 1
     boolean Player2 = false; // tells the player if there is a player 2
 
-    boolean turn = false; // tells the player if it's their turn
+    boolean turn = false; // tells the player if its their turn
 
     int col = -1; // tells the player where other player placed chip in order to modify their own screen
 
