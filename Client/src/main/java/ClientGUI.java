@@ -25,7 +25,8 @@ public class ClientGUI extends Application {
 
 	GameButton[][] grid;
 
-	int playerNum;
+	Text playerLabel;
+
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -95,12 +96,14 @@ public class ClientGUI extends Application {
 					System.out.println(client.getGameInfo().getCol());
 					playChip(client.getGameInfo().getCol(), false);
 				}
+				System.out.println("Received message on player " + client.getPlayerNum());
+				playerLabel.setText("Player " + client.getPlayerNum());
 			});
 		}, ip, port);
 
-		grid = new GameButton[7][6];
-		for(int i = 0; i < 7; i++) {
-			for(int j = 0; j < 6; j++) {
+		grid = new GameButton[6][7];
+		for(int i = 0; i < 6; i++) {
+			for(int j = 0; j < 7; j++) {
 				GameButton button = new GameButton(i, j);
 				button.setStyle("-fx-background-color: #818181;" +
 						"-fx-background-radius: 10");
@@ -108,14 +111,13 @@ public class ClientGUI extends Application {
 				int finalI = i;
 				int finalJ = j;
 				button.setOnAction(e -> { // Once button on grid is pressed, this event is fired
-					playChip(finalJ, true);
+					playChip(finalI, true);
 					System.out.println("CLicking button " + finalI + " " + finalJ);
 				});
 				grid[i][j] = button;
 
 			}
 		}
-		playerNum = client.getPlayerNum();
 		System.out.println("Changing scene");
 		client.start();
 		stage.setScene(gameScene());
@@ -131,17 +133,21 @@ public class ClientGUI extends Application {
 				"-fx-background-radius: 15");
 		game_grid.setMaxWidth(400);
 		game_grid.setMaxHeight(400);
-		for (int i = 0; i < 7; i++){
-			for (int j = 0; j < 6; j++){
-				game_grid.add(grid[i][j], j, i);
+		for (int i = 0; i < 6; i++){
+			for (int j = 0; j < 7; j++){
+				game_grid.add(grid[i][j], i, j);
 			}
 		}
+
+		playerLabel = new Text();
+		playerLabel.setStyle("-fx-fill: white");
+		playerLabel.setFont(Font.font("Arial", 35));
 
 //		Text player_state = new Text(client.getGameInfo().getStatus());
 //		player_state.setStyle("-fx-fill: white");
 //		player_state.setFont(Font.font("Arial", 30));
 
-		VBox root = new VBox(game_grid);
+		VBox root = new VBox(playerLabel, game_grid);
 		root.setAlignment(Pos.CENTER);
 		root.setSpacing(20);
 		root.setStyle("-fx-background-color: #3C3C3D");
@@ -194,8 +200,8 @@ public class ClientGUI extends Application {
 		if (button != null) { // Found a valid spot to place chip
 			System.out.println("Playing col " + col);
 			if (currentPlayersMove) {
-				client.getGameInfo().recentMove = "Player " + playerNum + " placed a chip in column " + col;
-				if (playerNum == 1) { // Change color of spot and move on to next player
+				client.getGameInfo().recentMove = "Player " + client.getPlayerNum() + " placed a chip in column " + col;
+				if (client.getPlayerNum() == 1) { // Change color of spot and move on to next player
 					button.setColor("Purple");
 					button.setStyle("-fx-background-color: #673AB7;" +
 							"-fx-background-radius: 10");
@@ -205,7 +211,7 @@ public class ClientGUI extends Application {
 							"-fx-background-radius: 10");
 				}
 			} else {
-				if (playerNum == 1) { // Change color of spot and move on to next player
+				if (client.getPlayerNum() == 1) { // Change color of spot and move on to next player
 					button.setColor("Cyan");
 					button.setStyle("-fx-background-color: #00908F;" +
 							"-fx-background-radius: 10");
@@ -224,7 +230,7 @@ public class ClientGUI extends Application {
 		int row = 0;
 
 		while (row < 7) {
-			GameButton button = grid[row][col];
+			GameButton button = grid[col][row];
 
 			if (button.getColor() != "Gray") {
 				return null;
@@ -232,7 +238,7 @@ public class ClientGUI extends Application {
 			if (row == 6 && button.getColor() == "Gray") {
 				return button;
 			}
-			if (grid[row+1][col].getColor() != "Gray") {
+			if (grid[col][row+1].getColor() != "Gray") {
 				return button;
 			}
 			row++;

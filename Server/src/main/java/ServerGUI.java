@@ -93,10 +93,9 @@ public class ServerGUI extends Application {
 	}
 
 	public Scene mainScene() {
-		Text numOfClients = new Text("Clients connected: " + server.getNumOfClients());
 		log = new ListView<String>();
 		log.setStyle("-fx-background-color: #3C3C3D");
-		VBox root = new VBox(numOfClients, log);
+		VBox root = new VBox(log);
 		root.setStyle("-fx-background-color: #3C3C3D");
 		Scene scene = new Scene(root, 700, 600);
 		return scene;

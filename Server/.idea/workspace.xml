@@ -5,29 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="47383d95-58fc-4777-9e9f-7b9fcbe695a6" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../Client/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../Client/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Client/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../Client/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Client/src/main/java/CFourInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Client/src/main/java/CFourInfo.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Client/src/main/java/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Client/src/main/java/Client.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Client/src/main/java/ClientGUI.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Client/src/main/java/ClientGUI.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Client/src/main/java/GameButton.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Client/src/main/java/GameButton.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Client/target/classes/CFourInfo.class" beforeDir="false" afterPath="$PROJECT_DIR$/../Client/target/classes/CFourInfo.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Client/target/classes/CSS/mainmenu.css" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../Client/target/classes/Client.class" beforeDir="false" afterPath="$PROJECT_DIR$/../Client/target/classes/Client.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Client/target/classes/ClientGUI.class" beforeDir="false" afterPath="$PROJECT_DIR$/../Client/target/classes/ClientGUI.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Client/target/classes/FXML/mainmenu.fxml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Client/target/classes/GameButton.class" beforeDir="false" afterPath="$PROJECT_DIR$/../Client/target/classes/GameButton.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Client/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/../Client/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Client/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/../Client/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/CFourInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/CFourInfo.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/GameButton.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/GameButton.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Server.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ServerGUI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ServerGUI.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/Server$ClientThread.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Server$ClientThread.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/Server$TheServer.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Server$TheServer.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/Server.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Server.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -93,6 +80,8 @@
       <workItem from="1668871320435" duration="2136000" />
       <workItem from="1668889088277" duration="4176000" />
       <workItem from="1668983211550" duration="12884000" />
+      <workItem from="1669074731657" duration="599000" />
+      <workItem from="1669084026688" duration="4996000" />
     </task>
     <servers />
   </component>

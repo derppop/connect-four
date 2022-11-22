@@ -47,7 +47,6 @@ public class Client extends Thread{
                 CFourInfo data = (CFourInfo) in.readObject();
                 gameInfo = data;
                 playerNum = gameInfo.getPlayerNum();
-                System.out.println(playerNum);
                 callback.accept(data);
             }
             catch(Exception e) {}

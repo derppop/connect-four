@@ -34,42 +34,17 @@ public class Server {
                     ClientThread client = new ClientThread(mySocket.accept(), count);
                     callback.accept("A Client has connected: Client #" + count);
                     clients.add(client);
-                    if (count == 1) {
-                        gameInfo.setPlayer1(true); // there is one player
-                    } else if (count == 2) {
-                        gameInfo.setPlayer2(true); // there is two players
-                    } else {
-                        System.out.println("More than two players, dont know what to do");
-                    }
                     client.start();
                     count++;
                 }
             } catch(Exception e) {
-                callback.accept("Server"); // DO NOT UNDERSTAND
+                callback.accept("Server");
             }
         }
     }
 
-    // this function is broken
     public void updateGameInfo(ClientThread t) {
-        if (gameInfo.isPlayer1() && gameInfo.isPlayer2()) {
-            if (playersTurn == 1) { // tell player 1 it's their turn and player two it's not
-                gameInfo.status = "Player one's turn";
-                if(t.count == 1) {
-                    gameInfo.setTurn(true);
-                } else if (t.count == 2) {
-                    gameInfo.setTurn(false);
-                }
-            } else if (playersTurn == 2) { // tell player 1 it's not their turn and player two that it is
-                gameInfo.status = "Player two's turn";
-                if(t.count == 1) {
-                    gameInfo.setTurn(false);
-                } else if (t.count == 2) {
-                    gameInfo.setTurn(true);
-                }
-            }
-            System.out.println(gameInfo.getPlayerNum());
-        }
+        System.out.println("Sending message to player " + t.count);
         gameInfo.setPlayerNum(t.count);
     }
 
@@ -126,9 +101,6 @@ public class Server {
         }
     }
 
-    public int getNumOfClients() {
-        return count-1;
-    }
 
     public int getPort() {
         return port;
