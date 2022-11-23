@@ -27,6 +27,8 @@ public class ClientGUI extends Application {
 
 	Text playerLabel;
 
+	Text playerStatus;
+
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -93,11 +95,15 @@ public class ClientGUI extends Application {
 		client = new Client(data -> {
 			Platform.runLater(() -> {
 				if (client.getGameInfo().getCol() != -1) {
-					System.out.println(client.getGameInfo().getCol());
+					System.out.println("Received col from other client: " + client.getGameInfo().getCol());
 					playChip(client.getGameInfo().getCol(), false);
+					client.getGameInfo().setCol(-1);
 				}
-				System.out.println("Received message on player " + client.getPlayerNum());
+//				System.out.println("Received message on player " + client.getPlayerNum());
 				playerLabel.setText("Player " + client.getPlayerNum());
+				playerStatus.setText(client.getGameInfo().getStatus());
+//				System.out.println("Received status: " + client.getGameInfo().getStatus());
+
 			});
 		}, ip, port);
 
@@ -112,10 +118,9 @@ public class ClientGUI extends Application {
 				int finalJ = j;
 				button.setOnAction(e -> { // Once button on grid is pressed, this event is fired
 					playChip(finalI, true);
-					System.out.println("CLicking button " + finalI + " " + finalJ);
+//					System.out.println("CLicking button " + finalI + " " + finalJ);
 				});
 				grid[i][j] = button;
-
 			}
 		}
 		System.out.println("Changing scene");
@@ -124,6 +129,7 @@ public class ClientGUI extends Application {
 	}
 
 	public Scene gameScene() {
+
 		GridPane game_grid = new GridPane();
 		game_grid.setPadding(new Insets(10, 10, 10, 10));
 		game_grid.setVgap(20);
@@ -143,11 +149,11 @@ public class ClientGUI extends Application {
 		playerLabel.setStyle("-fx-fill: white");
 		playerLabel.setFont(Font.font("Arial", 35));
 
-//		Text player_state = new Text(client.getGameInfo().getStatus());
-//		player_state.setStyle("-fx-fill: white");
-//		player_state.setFont(Font.font("Arial", 30));
+		playerStatus = new Text();
+		playerStatus.setStyle("-fx-fill: white");
+		playerStatus.setFont(Font.font("Arial", 30));
 
-		VBox root = new VBox(playerLabel, game_grid);
+		VBox root = new VBox(playerLabel, game_grid, playerStatus);
 		root.setAlignment(Pos.CENTER);
 		root.setSpacing(20);
 		root.setStyle("-fx-background-color: #3C3C3D");
@@ -195,38 +201,46 @@ public class ClientGUI extends Application {
 	}
 
 	private void playChip(int col, boolean currentPlayersMove) {
-
-		GameButton button = findEmptySpot(col);
-		if (button != null) { // Found a valid spot to place chip
-			System.out.println("Playing col " + col);
-			if (currentPlayersMove) {
-				client.getGameInfo().recentMove = "Player " + client.getPlayerNum() + " placed a chip in column " + col;
-				if (client.getPlayerNum() == 1) { // Change color of spot and move on to next player
-					button.setColor("Purple");
-					button.setStyle("-fx-background-color: #673AB7;" +
-							"-fx-background-radius: 10");
+		if (client.getGameInfo().isTurn()) {
+			GameButton button = findEmptySpot(col);
+			if (button != null) { // Found a valid spot to place chip
+//				System.out.println("Playing col " + col);
+				client.getGameInfo().setCol(col); // to tell other player what I played
+				if (currentPlayersMove) {
+					client.getGameInfo().recentMove = "Player " + client.getPlayerNum() + " placed a chip in column " + col;
+					if (client.getPlayerNum() == 1) { // Change color of spot and move on to next player
+						button.setColor("Purple");
+						button.setStyle("-fx-background-color: #673AB7;" +
+								"-fx-background-radius: 10");
+					} else {
+						button.setColor("Cyan");
+						button.setStyle("-fx-background-color: #00908F;" +
+								"-fx-background-radius: 10");
+					}
+					client.send(client.getGameInfo());
 				} else {
-					button.setColor("Cyan");
-					button.setStyle("-fx-background-color: #00908F;" +
-							"-fx-background-radius: 10");
+					if (client.getPlayerNum() == 1) { // Change color of spot and move on to next player
+						button.setColor("Cyan");
+						button.setStyle("-fx-background-color: #00908F;" +
+								"-fx-background-radius: 10");
+					} else {
+						button.setColor("Purple");
+						button.setStyle("-fx-background-color: #673AB7;" +
+								"-fx-background-radius: 10");
+					}
 				}
+				button.setDisable(true);
 			} else {
-				if (client.getPlayerNum() == 1) { // Change color of spot and move on to next player
-					button.setColor("Cyan");
-					button.setStyle("-fx-background-color: #00908F;" +
-							"-fx-background-radius: 10");
-				} else {
-					button.setColor("Purple");
-					button.setStyle("-fx-background-color: #673AB7;" +
-							"-fx-background-radius: 10");
-				}
+				// Invalid play
 			}
-			button.setDisable(true);
+		} else {
+			// not this players turn
+			System.out.println("Not your turn, cannot play");
 		}
 	}
 
 	private GameButton findEmptySpot(int col) {
-		System.out.println("Looking for spot in col " + col);
+//		System.out.println("Looking for spot in col " + col);
 		int row = 0;
 
 		while (row < 7) {

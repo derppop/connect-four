@@ -5,6 +5,10 @@ import java.util.Objects;
 // Player 1 : Purple
 // Player 2 : Cyan
 public class CFourInfo implements Serializable {
+
+    public CFourInfo() {
+        System.out.println("Making instance of CFourInfo");
+    }
     boolean Player1 = false; // tells player if there is a player 1
     boolean Player2 = false; // tells the player if there is a player 2
 

@@ -28,7 +28,7 @@ public class Client extends Thread{
         callback = call;
         this.ipAddress = ipAddress;
         this.port = port;
-        this.gameInfo = new CFourInfo();
+
     }
 
     public void run() {
@@ -39,17 +39,21 @@ public class Client extends Thread{
             in = new ObjectInputStream(socketClient.getInputStream());
             socketClient.setTcpNoDelay(true);
         }
+
         catch(Exception e) {}
 
         while(true) {
-
             try {
-                CFourInfo data = (CFourInfo) in.readObject();
-                gameInfo = data;
+                CFourInfo tempGameInfo = (CFourInfo) in.readObject();
+                gameInfo = tempGameInfo;
                 playerNum = gameInfo.getPlayerNum();
-                callback.accept(data);
+                System.out.println("On player " + playerNum + ", received status: " + tempGameInfo.getStatus());
+
+                callback.accept(tempGameInfo);
             }
-            catch(Exception e) {}
+            catch(Exception e) {
+                System.out.println("ERROR RECEIVING VALUE");
+            }
         }
 
     }
@@ -66,10 +70,6 @@ public class Client extends Thread{
 
     public CFourInfo getGameInfo() {
         return gameInfo;
-    }
-
-    public void setGameInfo(CFourInfo gameInfo) {
-        this.gameInfo = gameInfo;
     }
 
     public int getPlayerNum() {

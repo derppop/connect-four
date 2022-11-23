@@ -1,3 +1,5 @@
+import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -22,7 +24,6 @@ public class Server {
         server.start();
         this.port = port;
         gameInfo = new CFourInfo();
-        gameInfo.setStatus("Waiting for second player");
     }
 
     public class TheServer extends Thread { // Instance of this class will sit in its own thread accepting clients
@@ -34,6 +35,13 @@ public class Server {
                     ClientThread client = new ClientThread(mySocket.accept(), count);
                     callback.accept("A Client has connected: Client #" + count);
                     clients.add(client);
+                    if ((count & 1) == 1) { // count is odd, player 1
+                        gameInfo.setStatus("Waiting for second player");
+                        gameInfo.setPlayer1(true);
+                    } else { // count is even, player 2
+                        gameInfo.setStatus("Player one's turn");
+                        gameInfo.setPlayer2(true);
+                    }
                     client.start();
                     count++;
                 }
@@ -44,7 +52,32 @@ public class Server {
     }
 
     public void updateGameInfo(ClientThread t) {
-        System.out.println("Sending message to player " + t.count);
+        if (gameInfo.isPlayer1() && gameInfo.isPlayer2()) { // there are two players
+            System.out.println("Sending message to player " + t.count);
+            if ((t.count & 1) == 1) { // odd, player 1
+                if (playersTurn == 1) { // it is player 1's turn
+                    gameInfo.setStatus("Player one's turn");
+                    System.out.println("1 Player 1's turn");
+                    gameInfo.setTurn(true);
+                } else {
+                    gameInfo.setStatus("Player two's turn");
+                    System.out.println("1 Player 2's turn");
+                    gameInfo.setTurn(false);
+                }
+            } else { // even, player 2
+                if (playersTurn == 2) { // it is player 2's turn
+                    gameInfo.setStatus("Player two's turn");
+                    System.out.println("2 Player 2's turn");
+                    gameInfo.setTurn(true);
+                } else {
+                    gameInfo.setStatus("Player one's turn");
+                    System.out.println("2 Player 1's turn");
+                    gameInfo.setTurn(false);
+                }
+            }
+        } else {
+            System.out.println("Not enough players");
+        }
         gameInfo.setPlayerNum(t.count);
     }
 
@@ -63,10 +96,10 @@ public class Server {
 
             for(int i = 0; i < clients.size(); i++) {
                 ClientThread t = clients.get(i);
-                updateGameInfo(t);
-
                 try{
+                    updateGameInfo(t);
                     t.out.writeObject(gameInfo);
+                    t.out.reset();
                 }
                 catch (Exception e) {}
             }
@@ -83,6 +116,9 @@ public class Server {
             }
 
             updateClients();
+            if (gameInfo.isPlayer1() && gameInfo.isPlayer2()) {
+                nextTurn();
+            }
 
             while(true) {
                 try {
@@ -90,19 +126,24 @@ public class Server {
                     callback.accept(data.getRecentMove());
                     gameInfo = data;
                     updateClients();
+                    nextTurn();
 
                 }
                 catch(Exception e) {
-                    callback.accept("OOOOPPs...Something wrong with the socket from client: " + count + "....closing down!");
+                    callback.accept("Client #" + count + " has disconnected!");
                     clients.remove(this);
                     break;
                 }
             }
         }
-    }
-
-
-    public int getPort() {
-        return port;
+        public void nextTurn() {
+            if (playersTurn == 1) { // move turn to next player
+                System.out.println("Changing turn to player 2");
+                playersTurn = 2;
+            } else {
+                System.out.println("Changing turn to player 1");
+                playersTurn = 1;
+            }
+        }
     }
 }
