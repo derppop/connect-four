@@ -1,3 +1,5 @@
+import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -49,40 +51,33 @@ public class Server {
         }
     }
 
-    // FUNCTION MIGHT BE BROKEN
     public void updateGameInfo(ClientThread t) {
         if (gameInfo.isPlayer1() && gameInfo.isPlayer2()) { // there are two players
-            gameInfo.setStatus("Test");
-//            System.out.println("Sending message to player " + t.count);
-//            if ((t.count & 1) == 1) { // odd, player 1
-//                if (playersTurn == 1) { // it is player 1's turn
-//                    gameInfo.setStatus("Player one's turn");
-////                    System.out.println("Player 1's turn");
-//                    gameInfo.setTurn(true);
-////                    System.out.println("Turn is" + gameInfo.isTurn());
-//                } else {
-//                    gameInfo.setStatus("Player two's turn");
-////                    System.out.println("Player 2's turn");
-//                    gameInfo.setTurn(false);
-////                    System.out.println("Turn is" + gameInfo.isTurn());
-//                }
-//            } else { // even, player 2
-//                if (playersTurn == 2) { // it is player 2's turn
-//                    gameInfo.setStatus("Player two's turn");
-////                    System.out.println("Player 2's turn");
-//                    gameInfo.setTurn(true);
-////                    System.out.println("Turn is" + gameInfo.isTurn());
-//                } else {
-//                    gameInfo.setStatus("Player one's turn");
-////                    System.out.println("Player 1's turn");
-//                    gameInfo.setTurn(false);
-////                    System.out.println("Turn is" + gameInfo.isTurn());
-//                }
-//            }
+            System.out.println("Sending message to player " + t.count);
+            if ((t.count & 1) == 1) { // odd, player 1
+                if (playersTurn == 1) { // it is player 1's turn
+                    gameInfo.setStatus("Player one's turn");
+                    System.out.println("1 Player 1's turn");
+                    gameInfo.setTurn(true);
+                } else {
+                    gameInfo.setStatus("Player two's turn");
+                    System.out.println("1 Player 2's turn");
+                    gameInfo.setTurn(false);
+                }
+            } else { // even, player 2
+                if (playersTurn == 2) { // it is player 2's turn
+                    gameInfo.setStatus("Player two's turn");
+                    System.out.println("2 Player 2's turn");
+                    gameInfo.setTurn(true);
+                } else {
+                    gameInfo.setStatus("Player one's turn");
+                    System.out.println("2 Player 1's turn");
+                    gameInfo.setTurn(false);
+                }
+            }
         } else {
             System.out.println("Not enough players");
         }
-
         gameInfo.setPlayerNum(t.count);
     }
 
@@ -101,11 +96,10 @@ public class Server {
 
             for(int i = 0; i < clients.size(); i++) {
                 ClientThread t = clients.get(i);
-                updateGameInfo(t);
-
                 try{
-                    System.out.println("Sending status to player " + (i + 1) + ": " + gameInfo.getStatus());
+                    updateGameInfo(t);
                     t.out.writeObject(gameInfo);
+                    t.out.reset();
                 }
                 catch (Exception e) {}
             }
@@ -122,6 +116,9 @@ public class Server {
             }
 
             updateClients();
+            if (gameInfo.isPlayer1() && gameInfo.isPlayer2()) {
+                nextTurn();
+            }
 
             while(true) {
                 try {
@@ -129,18 +126,23 @@ public class Server {
                     callback.accept(data.getRecentMove());
                     gameInfo = data;
                     updateClients();
+                    nextTurn();
 
-                    if (playersTurn == 1) { // move turn to next player
-                        playersTurn = 2;
-                    } else {
-                        playersTurn = 1;
-                    }
                 }
                 catch(Exception e) {
-                    callback.accept("OOOOPPs...Something wrong with the socket from client: " + count + "....closing down!");
+                    callback.accept("Client #" + count + " has disconnected!");
                     clients.remove(this);
                     break;
                 }
+            }
+        }
+        public void nextTurn() {
+            if (playersTurn == 1) { // move turn to next player
+                System.out.println("Changing turn to player 2");
+                playersTurn = 2;
+            } else {
+                System.out.println("Changing turn to player 1");
+                playersTurn = 1;
             }
         }
     }

@@ -94,16 +94,15 @@ public class ClientGUI extends Application {
 	private void initializeGame(String ip, int port) {
 		client = new Client(data -> {
 			Platform.runLater(() -> {
-				client.setGameInfo((CFourInfo) data);
 				if (client.getGameInfo().getCol() != -1) {
-//					System.out.println("Received col from other client: " + client.getGameInfo().getCol());
+					System.out.println("Received col from other client: " + client.getGameInfo().getCol());
 					playChip(client.getGameInfo().getCol(), false);
 					client.getGameInfo().setCol(-1);
 				}
-				System.out.println("Received message on player " + client.getPlayerNum());
+//				System.out.println("Received message on player " + client.getPlayerNum());
 				playerLabel.setText("Player " + client.getPlayerNum());
 				playerStatus.setText(client.getGameInfo().getStatus());
-				System.out.println("Received status: " + client.getGameInfo().getStatus());
+//				System.out.println("Received status: " + client.getGameInfo().getStatus());
 
 			});
 		}, ip, port);
@@ -119,7 +118,7 @@ public class ClientGUI extends Application {
 				int finalJ = j;
 				button.setOnAction(e -> { // Once button on grid is pressed, this event is fired
 					playChip(finalI, true);
-					System.out.println("CLicking button " + finalI + " " + finalJ);
+//					System.out.println("CLicking button " + finalI + " " + finalJ);
 				});
 				grid[i][j] = button;
 			}
@@ -130,6 +129,7 @@ public class ClientGUI extends Application {
 	}
 
 	public Scene gameScene() {
+
 		GridPane game_grid = new GridPane();
 		game_grid.setPadding(new Insets(10, 10, 10, 10));
 		game_grid.setVgap(20);
@@ -204,7 +204,7 @@ public class ClientGUI extends Application {
 		if (client.getGameInfo().isTurn()) {
 			GameButton button = findEmptySpot(col);
 			if (button != null) { // Found a valid spot to place chip
-				System.out.println("Playing col " + col);
+//				System.out.println("Playing col " + col);
 				client.getGameInfo().setCol(col); // to tell other player what I played
 				if (currentPlayersMove) {
 					client.getGameInfo().recentMove = "Player " + client.getPlayerNum() + " placed a chip in column " + col;
@@ -217,7 +217,7 @@ public class ClientGUI extends Application {
 						button.setStyle("-fx-background-color: #00908F;" +
 								"-fx-background-radius: 10");
 					}
-//					client.send(client.getGameInfo());
+					client.send(client.getGameInfo());
 				} else {
 					if (client.getPlayerNum() == 1) { // Change color of spot and move on to next player
 						button.setColor("Cyan");
