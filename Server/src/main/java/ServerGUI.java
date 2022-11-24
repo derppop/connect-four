@@ -52,7 +52,7 @@ public class ServerGUI extends Application {
 		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() { // Closes server when user closes server window
 			@Override
 			public void handle(WindowEvent t) {
-				closeServer();
+				closeApplication();
 			}
 		});
 	}
@@ -111,7 +111,7 @@ public class ServerGUI extends Application {
 		stage.setScene(mainScene());
 	}
 
-	public void closeServer() {
+	public void closeApplication() {
 		System.out.println("Closing server!");
 		Platform.exit();
 		System.exit(0);

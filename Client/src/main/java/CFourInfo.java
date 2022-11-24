@@ -22,6 +22,8 @@ public class CFourInfo implements Serializable {
 
     int playerNum;
 
+    int playerWon = 0;
+
     public boolean isPlayer1() {
         return Player1;
     }
@@ -76,5 +78,13 @@ public class CFourInfo implements Serializable {
 
     public void setPlayerNum(int playerNum) {
         this.playerNum = playerNum;
+    }
+
+    public int getPlayerWon() {
+        return playerWon;
+    }
+
+    public void setPlayerWon(int playerWon) {
+        this.playerWon = playerWon;
     }
 }

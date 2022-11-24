@@ -9,6 +9,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -47,7 +48,7 @@ public class ClientGUI extends Application {
 		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() { // Closes server when user closes server window
 			@Override
 			public void handle(WindowEvent t) {
-				closeServer();
+				closeApplication();
 			}
 		});
 	}
@@ -94,6 +95,9 @@ public class ClientGUI extends Application {
 	private void initializeGame(String ip, int port) {
 		client = new Client(data -> {
 			Platform.runLater(() -> {
+				if (client.getGameInfo().getPlayerWon() != 0) {
+					stage.setScene(gameOverScene());
+				}
 				if (client.getGameInfo().getCol() != -1) {
 					System.out.println("Received col from other client: " + client.getGameInfo().getCol());
 					playChip(client.getGameInfo().getCol(), false);
@@ -117,7 +121,7 @@ public class ClientGUI extends Application {
 				int finalI = i;
 				int finalJ = j;
 				button.setOnAction(e -> { // Once button on grid is pressed, this event is fired
-					playChip(finalI, true);
+					playChip(finalJ, true);
 //					System.out.println("CLicking button " + finalI + " " + finalJ);
 				});
 				grid[i][j] = button;
@@ -141,7 +145,7 @@ public class ClientGUI extends Application {
 		game_grid.setMaxHeight(400);
 		for (int i = 0; i < 6; i++){
 			for (int j = 0; j < 7; j++){
-				game_grid.add(grid[i][j], i, j);
+				game_grid.add(grid[i][j], j, i);
 			}
 		}
 
@@ -162,39 +166,45 @@ public class ClientGUI extends Application {
 		return scene;
 	}
 
-//	public Scene gameOverScene() {
-//		Text game_over = new Text("Game Over");
-//		game_over.setStyle("-fx-fill: white");
-//		game_over.setFont(Font.font("Arial", 50));
-//		game_over.setText("Player " + client.getGameState().getPlayer() + "Wins!");
-//
-//		Text which_player_won = new Text("");
-//		which_player_won.setStyle("-fx-fill: white");
-//		which_player_won.setFont(Font.font("Arial", 50));
-//		which_player_won.setText("text here..."); // didn't finish
-//
-//		Button playAgainButton = new Button("Play Again");
-//		playAgainButton.setStyle("-fx-background-color: #606060;" + "-fx-text-fill: white");
-//		playAgainButton.setOnAction(e -> {
-//			stage.setScene(gameScene());
-//		});
-//
-//		Button quitButton = new Button("Quit");
-//		quitButton.setStyle("-fx-background-color: #606060;" + "-fx-text-fill: white");
-//		quitButton.setOnAction(e -> {
-//			Platform.exit();
-//		});
-//
-//		VBox root = new VBox(game_over, which_player_won, playAgainButton, quitButton);
-//		root.setAlignment(Pos.CENTER);
-//		root.setSpacing(20);
-//		root.setStyle("-fx-background-color: #3C3C3D");
-//
-//		Scene scene = new Scene(root, 700,600);
-//		return scene;
-//	}
+	public Scene gameOverScene() {
+		Text gameOver = new Text("Game Over");
+		gameOver.setStyle("-fx-fill: white");
+		gameOver.setFont(Font.font("Arial", 50));
 
-	public void closeServer() {
+		Text winner = new Text();
+		if (client.getGameInfo().getPlayerWon() == -1) {
+			winner.setText("There was a tie!");
+		} else {
+			winner.setText("Player " + client.getGameInfo().getPlayerWon() + " wins!");
+		}
+		winner.setStyle("-fx-fill: white");
+		winner.setFont(Font.font("Arial", 35));
+
+		Button quitButton = new Button("Quit");
+		quitButton.setStyle("-fx-background-color: #606060;" + "-fx-text-fill: white");
+		quitButton.setOnAction(e -> {
+			closeApplication();
+		});
+
+		Button playAgainButton = new Button("Play Again");
+		playAgainButton.setStyle("-fx-background-color: #606060;" + "-fx-text-fill: white");
+		playAgainButton.setOnAction(e -> {
+			stage.setScene(gameScene());
+		});
+
+		HBox options = new HBox(playAgainButton, quitButton);
+		options.setAlignment(Pos.CENTER);
+		options.setSpacing(10);
+		VBox root = new VBox(gameOver, winner, options);
+		root.setAlignment(Pos.CENTER);
+		root.setSpacing(20);
+		root.setStyle("-fx-background-color: #3C3C3D");
+
+		Scene scene = new Scene(root, 700,600);
+		return scene;
+	}
+
+	public void closeApplication() {
 		System.out.println("Closing client!");
 		Platform.exit();
 		System.exit(0);
@@ -216,6 +226,16 @@ public class ClientGUI extends Application {
 						button.setColor("Cyan");
 						button.setStyle("-fx-background-color: #00908F;" +
 								"-fx-background-radius: 10");
+					}
+					if (checkForWin()) {
+						client.getGameInfo().setRecentMove("Player " + client.getPlayerNum() + " won!");
+						client.getGameInfo().setPlayerWon(client.getPlayerNum());
+					}
+
+					if (checkForTie()) {
+						System.out.println("There was a tie!");
+						client.getGameInfo().setRecentMove("There was a tie!"); // might need to do this on server in order to preserve last move that was played because this is overriding the last move
+						client.getGameInfo().setPlayerWon(-1);
 					}
 					client.send(client.getGameInfo());
 				} else {
@@ -239,20 +259,130 @@ public class ClientGUI extends Application {
 		}
 	}
 
+	private boolean checkForTie() {
+		for (int i = 0; i < 6; i++){
+			for (int j = 0; j < 7; j++){
+				GameButton button = grid[i][j];
+				if (button.getColor() == "Gray") {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	private boolean checkForWin() {
+		String colorTarget;
+		if (client.getPlayerNum() == 1) {
+			colorTarget = "Purple";
+		} else {
+			colorTarget = "Cyan";
+		}
+
+		for (int i = 0; i < 6; i++){
+			for (int j = 0; j < 7; j++){
+				GameButton button = grid[i][j];
+				if (button.getColor() == colorTarget) {
+					if (checkVertical(colorTarget, i, j)) {
+						System.out.println("Vertical win!");
+						return true;
+					}
+
+					if (checkHorizontal(colorTarget, i, j)) {
+						System.out.println("Horizontal win!");
+						return true;
+					}
+
+					if (checkLeftDiagonal(colorTarget, i, j)) {
+						System.out.println("Left diagonal win!");
+						return true;
+					}
+					if (checkRightDiagonal(colorTarget, i, j)) {
+						System.out.println("Right diagonal win!");
+						return true;
+					}
+ 				}
+			}
+		}
+		return false;
+	}
+
+	private boolean checkVertical(String colorTarget, int row, int col) {
+		int count = 0;
+		GameButton button;
+		while (row < 6) { // so we dont fall out of bounds
+			button = grid[row][col];
+			if (button.getColor() == colorTarget) {
+				count++;
+			} else {
+				return false;
+			}
+			row++;
+		}
+		return count >= 4;
+	}
+
+	private boolean checkHorizontal(String colorTarget, int row, int col) {
+		int count = 0;
+		GameButton button;
+		while (col < 7) { // so we dont fall out of bounds
+			button = grid[row][col];
+			if (button.getColor() == colorTarget) {
+				count++;
+			} else {
+				return false;
+			}
+			col++;
+		}
+		return count >= 4;
+	}
+
+	private boolean checkLeftDiagonal(String colorTarget, int row, int col) {
+		int count = 0;
+		GameButton button;
+		while (col >= 0 && col < 7 && row < 6) { // so we dont fall out of bounds
+			button = grid[row][col];
+			if (button.getColor() == colorTarget) {
+				count++;
+			} else {
+				return false;
+			}
+			row++;
+			col--;
+		}
+		return count >= 4;
+	}
+
+	private boolean checkRightDiagonal(String colorTarget, int row, int col) {
+		int count = 0;
+		GameButton button;
+		while (col >= 0 && col < 7 && row < 6) { // so we dont fall out of bounds
+			button = grid[row][col];
+			if (button.getColor() == colorTarget) {
+				count++;
+			} else {
+				return false;
+			}
+			row++;
+			col++;
+		}
+		return count >= 4;
+	}
+
 	private GameButton findEmptySpot(int col) {
-//		System.out.println("Looking for spot in col " + col);
+		System.out.println("Looking for spot in col " + col);
 		int row = 0;
 
-		while (row < 7) {
-			GameButton button = grid[col][row];
+		while (row < 6) {
+			GameButton button = grid[row][col];
 
 			if (button.getColor() != "Gray") {
 				return null;
 			}
-			if (row == 6 && button.getColor() == "Gray") {
+			if (row == 5 && button.getColor() == "Gray") {
 				return button;
 			}
-			if (grid[col][row+1].getColor() != "Gray") {
+			if (grid[row+1][col].getColor() != "Gray") {
 				return button;
 			}
 			row++;
